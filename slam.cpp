@@ -13,10 +13,6 @@ using namespace std;
 
 int process_frame( const char* WIN, Mat frame, int frameNum )
 {
-    Ptr<ORB> orb = ORB::create();
-    vector<KeyPoint> kp;
-    Mat desc;
-
     if( frame.empty() )
     {
         cout << "Video Over" << endl;
@@ -25,11 +21,19 @@ int process_frame( const char* WIN, Mat frame, int frameNum )
 
     cout << "Frame: " << frameNum << endl;
     resize( frame, frame, Size(480, 270) );
-    orb->detectAndCompute( frame, noArray(), kp, desc );
 
-    for( vector<KeyPoint>::iterator it = kp.begin(); it != kp.end(); ++it )
+    // make the frame black and white
+    Mat framebw;
+    cvtColor( frame, framebw, COLOR_BGR2GRAY );
+
+    // extract the "good" features from the frame
+    vector<Point2f> kp;
+    goodFeaturesToTrack( framebw, kp, 3000, 0.01, 3);
+
+    // plot the features over the frame
+    for( auto it = kp.begin(); it != kp.end(); ++it )
     {
-        circle( frame, it->pt, 3, Scalar(0,255,0) );
+        circle( frame, Point(it->x, it->y), 3, Scalar(0,255,0) );
     }
 
     imshow( WIN, frame );
