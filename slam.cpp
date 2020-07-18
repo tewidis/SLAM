@@ -9,9 +9,26 @@
 using namespace cv;
 using namespace std;
 
+int process_frame( const char* WIN, Mat frame, int frameNum )
+{
+    if( frame.empty() )
+    {
+        cout << "Video Over" << endl;
+        return 1;
+    }
+
+    cout << "Frame: " << frameNum << endl;
+    resize( frame, frame, Size(480, 270) );
+
+    imshow( WIN, frame );
+
+    char c = (char) waitKey(1);
+    if( c == 27 ) return 1;
+    return 0;
+}
+
 int main(int argc, char** argv)
 {
-    int frameNum = -1;
     VideoCapture vid( "videos/test_countryroad.mp4" );
     if( !vid.isOpened() )
     {
@@ -23,25 +40,17 @@ int main(int argc, char** argv)
     const char* WIN = "Original Video";
     namedWindow( WIN, WINDOW_AUTOSIZE );
     moveWindow( WIN, 420, 240 );
+    int frameNum = -1;
+    int isOver;
 
-    for(;;)
+    do
     {
         vid >> frame;
-
-        if( frame.empty() )
-        {
-            cout << "Video Over" << endl;
-        }
-
+        isOver = process_frame( WIN, frame, frameNum );
         frameNum = frameNum + 1;
-        cout << "Frame: " << frameNum << endl;
-        resize( frame, frame, Size(480, 270) );
-
-        imshow( WIN, frame );
-
-        char c = (char) waitKey(0);
-        if( c == 27 ) break;
-
     }
+    while( !isOver );
+
     return 0;
 }
+
