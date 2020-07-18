@@ -1,16 +1,22 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/features2d.hpp>
 
 using namespace cv;
 using namespace std;
 
 int process_frame( const char* WIN, Mat frame, int frameNum )
 {
+    Ptr<ORB> orb = ORB::create();
+    vector<KeyPoint> kp;
+    Mat desc;
+
     if( frame.empty() )
     {
         cout << "Video Over" << endl;
@@ -19,6 +25,12 @@ int process_frame( const char* WIN, Mat frame, int frameNum )
 
     cout << "Frame: " << frameNum << endl;
     resize( frame, frame, Size(480, 270) );
+    orb->detectAndCompute( frame, noArray(), kp, desc );
+
+    for( vector<KeyPoint>::iterator it = kp.begin(); it != kp.end(); ++it )
+    {
+        circle( frame, it->pt, 3, Scalar(0,255,0) );
+    }
 
     imshow( WIN, frame );
 
