@@ -27,21 +27,19 @@ int main(int argc, char** argv)
     const char* WIN = "Original Video";
     namedWindow( WIN, WINDOW_AUTOSIZE );
     moveWindow( WIN, 420, 240 );
-    int frameNum = -1;
     int isOver;
 
     do
     {
         vid >> frame;
-        isOver = process_frame( WIN, frame, frameNum );
-        frameNum = frameNum + 1;
+        isOver = process_frame( WIN, frame );
     }
     while( !isOver );
 
     return 0;
 }
 
-int process_frame( const char* WIN, Mat frame, int frameNum )
+int process_frame( const char* WIN, Mat frame )
 {
     if( frame.empty() )
     {
@@ -49,7 +47,6 @@ int process_frame( const char* WIN, Mat frame, int frameNum )
         return 1;
     }
 
-    cout << "Frame: " << frameNum << endl;
     resize( frame, frame, Size(480, 270) );
 
     Frame* f = new Frame();
