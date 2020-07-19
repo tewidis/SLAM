@@ -59,12 +59,12 @@ int process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
 
     if( all_frames->size() > 1 )
     {
-        match_frames( all_frames->end()[-1], all_frames->end()[-2], matches );
+        match_frames( all_frames->end()[-1], all_frames->end()[-2], &matches );
         cout << matches.size() << endl;
         // plot the matches
         drawMatches( all_frames->end()[-1]->frame, all_frames->end()[-1]->kps, \
                      all_frames->end()[-2]->frame, all_frames->end()[-2]->kps, \
-                     matches, outimg );
+                     matches, outimg, Scalar(255,0,0) );
     }
 
     // plot the key points over the frame

@@ -14,4 +14,4 @@ class Frame
         Frame( cv::Mat );
 };
 
-void match_frames( Frame* f1, Frame* f2, std::vector<std::vector<cv::DMatch>> );
+void match_frames( Frame* f1, Frame* f2, std::vector<std::vector<cv::DMatch>>* );

@@ -44,13 +44,12 @@ void Frame::extract( Mat window )
     features.clear();
 }
 
-//void match_frames( Frame* f1, Frame* f2, vector<tuple<KeyPoint,KeyPoint>> ret )
-void match_frames( Frame* f1, Frame* f2, vector<vector<DMatch>> ret )
+void match_frames( Frame* f1, Frame* f2, vector<vector<DMatch>>* ret )
 {
     // matching
     vector<vector<DMatch>> matches;
     BFMatcher bf( NORM_HAMMING );
-    bf.knnMatch( f1->des, f2->des, matches, 2 );
+    bf.knnMatch( f1->des, f2->des, *ret, 2 );
 
     for( int i = 0; i < matches.size(); i++ )
     {
@@ -58,10 +57,7 @@ void match_frames( Frame* f1, Frame* f2, vector<vector<DMatch>> ret )
         DMatch match2 = matches[i][1];
         if( match1.distance < 0.75 * match2.distance )
         {
-            ret.push_back( {match1, match2} );
-            //KeyPoint p1 = f1->kps[match1.queryIdx];
-            //KeyPoint p2 = f2->kps[match1.trainIdx];
-            //ret.push_back( tuple<KeyPoint,KeyPoint>( p1, p2 ) );
+            ret->push_back( {match1, match2} );
         }
     }
 }
