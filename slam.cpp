@@ -8,60 +8,11 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/features2d.hpp>
 
+#include "headers/slam.h"
+#include "headers/extractor.h"
+
 using namespace cv;
 using namespace std;
-
-int process_frame( const char* WIN, Mat frame, int frameNum )
-{
-    Ptr<ORB> orb = ORB::create();
-    if( frame.empty() )
-    {
-        cout << "Video Over" << endl;
-        return 1;
-    }
-
-    cout << "Frame: " << frameNum << endl;
-    resize( frame, frame, Size(480, 270) );
-
-    // make the frame black and white
-    Mat framebw;
-    cvtColor( frame, framebw, COLOR_BGR2GRAY );
-
-    // detecting the "good" features from the frame
-    vector<Point2f> features;
-    goodFeaturesToTrack( framebw, features, 3000, 0.01, 7);
-
-    // convert features to KeyPoints and extract the descriptors
-    vector<KeyPoint> kps;
-    for( size_t i = 0; i < features.size(); i++ )
-    {
-        kps.push_back( KeyPoint( features[i], 20 ) );
-    }
-    Mat descriptors;
-    orb->compute( frame, kps, descriptors );
-
-    // matching
-    vector<DMatch> matches;
-    BFMatcher bf(NORM_HAMMING);
-    bf.match( descriptors, matches );
-
-    for( auto it = matches.begin(); it != matches.end(); ++it )
-    {
-        cout << it->queryIdx << " " << it->trainIdx << endl;
-    }
-
-    // plot the features over the frame
-    for( auto it = kps.begin(); it != kps.end(); ++it )
-    {
-        circle( frame, it->pt, 3, Scalar(0,255,0) );
-    }
-
-    imshow( WIN, frame );
-
-    char c = (char) waitKey(1);
-    if( c == 27 ) return 1;
-    return 0;
-}
 
 int main(int argc, char** argv)
 {
@@ -90,3 +41,29 @@ int main(int argc, char** argv)
     return 0;
 }
 
+int process_frame( const char* WIN, Mat frame, int frameNum )
+{
+    if( frame.empty() )
+    {
+        cout << "Video Over" << endl;
+        return 1;
+    }
+
+    cout << "Frame: " << frameNum << endl;
+    resize( frame, frame, Size(480, 270) );
+
+    Frame* f = new Frame();
+    f->extract( frame );
+
+    // plot the features over the frame
+    for( auto it = f->kps.begin(); it != f->kps.end(); ++it )
+    {
+        circle( frame, it->pt, 3, Scalar(0,255,0) );
+    }
+
+    imshow( WIN, frame );
+
+    char c = (char) waitKey(1);
+    if( c == 27 ) return 1;
+    return 0;
+}

@@ -142,6 +142,33 @@ SLAM/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SLAM.dir/build.make CMakeFiles/SLAM.dir/build
 .PHONY : SLAM/fast
 
+extractor.o: extractor.cpp.o
+
+.PHONY : extractor.o
+
+# target to build an object file
+extractor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/SLAM.dir/build.make CMakeFiles/SLAM.dir/extractor.cpp.o
+.PHONY : extractor.cpp.o
+
+extractor.i: extractor.cpp.i
+
+.PHONY : extractor.i
+
+# target to preprocess a source file
+extractor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/SLAM.dir/build.make CMakeFiles/SLAM.dir/extractor.cpp.i
+.PHONY : extractor.cpp.i
+
+extractor.s: extractor.cpp.s
+
+.PHONY : extractor.s
+
+# target to generate assembly for a file
+extractor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/SLAM.dir/build.make CMakeFiles/SLAM.dir/extractor.cpp.s
+.PHONY : extractor.cpp.s
+
 slam.o: slam.cpp.o
 
 .PHONY : slam.o
@@ -178,6 +205,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... SLAM"
+	@echo "... extractor.o"
+	@echo "... extractor.i"
+	@echo "... extractor.s"
 	@echo "... slam.o"
 	@echo "... slam.i"
 	@echo "... slam.s"
