@@ -9,7 +9,6 @@
 #include <opencv2/features2d.hpp>
 
 #include "headers/slam.h"
-#include "headers/extractor.h"
 
 using namespace cv;
 using namespace std;
@@ -28,37 +27,49 @@ int main(int argc, char** argv)
     namedWindow( WIN, WINDOW_AUTOSIZE );
     moveWindow( WIN, 420, 240 );
     int isOver;
+    vector<Frame*>* all_frames = new vector<Frame*>();
 
     do
     {
         vid >> frame;
-        isOver = process_frame( WIN, frame );
+        if( frame.empty() )
+        {
+            cout << "Video Over" << endl;
+            break;
+        }
+        resize( frame, frame, Size(480, 270) );
+        Frame* f = new Frame( frame );
+        isOver = process_frame( WIN, f, all_frames );
     }
     while( !isOver );
 
+    delete( all_frames );
     return 0;
 }
 
-int process_frame( const char* WIN, Mat frame )
+int process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
 {
-    if( frame.empty() )
+    // detect and extract the features
+    f->extract( f->frame );
+    all_frames->push_back( f );
+
+    // if this isn't the first frame, match
+    Mat outimg = f->frame;
+    vector<vector<DMatch>> matches;
+
+    if( all_frames->size() > 1 )
     {
-        cout << "Video Over" << endl;
-        return 1;
+        match_frames( all_frames->end()[-1], all_frames->end()[-2], matches );
+        cout << matches.size() << endl;
+        // plot the matches
+        drawMatches( all_frames->end()[-1]->frame, all_frames->end()[-1]->kps, \
+                     all_frames->end()[-2]->frame, all_frames->end()[-2]->kps, \
+                     matches, outimg );
     }
 
-    resize( frame, frame, Size(480, 270) );
-
-    Frame* f = new Frame();
-    f->extract( frame );
-
-    // plot the features over the frame
-    for( auto it = f->kps.begin(); it != f->kps.end(); ++it )
-    {
-        circle( frame, it->pt, 3, Scalar(0,255,0) );
-    }
-
-    imshow( WIN, frame );
+    // plot the key points over the frame
+    //drawKeypoints( outimg, f->kps, outimg, Scalar(0,255,0) );
+    imshow( WIN, outimg );
 
     char c = (char) waitKey(1);
     if( c == 27 ) return 1;

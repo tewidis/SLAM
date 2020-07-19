@@ -7,12 +7,11 @@ class Frame
     public:
         std::vector<cv::KeyPoint> kps;
         cv::Mat des;
+        cv::Mat frame;
 
         void extract( cv::Mat );
-        void match_frames( Frame*, Frame* );
-        Frame( );
+        void match_frames( Frame*, Frame*, std::vector<std::vector<cv::DMatch>> );
+        Frame( cv::Mat );
 };
 
-//int extract( Mat window, Frame output );
-
-//void match_frames( Frame f1, Frame f2 );
+void match_frames( Frame* f1, Frame* f2, std::vector<std::vector<cv::DMatch>> );
