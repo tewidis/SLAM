@@ -40,7 +40,6 @@ int main(int argc, char** argv)
         resize( frame, frame, Size(480, 270) );
         Frame* f = new Frame( frame );
         isOver = process_frame( WIN, f, all_frames );
-        isOver = true;
     }
     while( !isOver );
 
@@ -66,15 +65,21 @@ bool process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
     if( all_frames->size() > 1 )
     {
         match_frames( all_frames->end()[-1], all_frames->end()[-2], &matches );
-        cout << matches.size() << endl;
-        // plot the matches
-        drawMatches( all_frames->end()[-1]->frame, all_frames->end()[-1]->kps, \
-                     all_frames->end()[-2]->frame, all_frames->end()[-2]->kps, \
-                     matches, outimg, Scalar(255,0,0) );
     }
 
     // plot the key points over the frame
     drawKeypoints( outimg, f->kps, outimg, Scalar(0,255,0) );
+
+    // plot the matches from one frame to the next
+    for( int i = 0; i < matches.size(); i++ )
+    {
+        // TODO: is matches being indexed properly?
+        Point pt1 = all_frames->end()[-1]->kps[matches[i][0].queryIdx].pt;
+        Point pt2 = all_frames->end()[-2]->kps[matches[i][0].trainIdx].pt;
+
+        line( outimg, pt1, pt2, Scalar(255,0,0) );
+    }
+
     imshow( WIN, outimg );
 
     char c = (char) waitKey(1);

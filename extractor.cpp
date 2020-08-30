@@ -45,7 +45,7 @@ void match_frames( Frame* f1, Frame* f2, vector<vector<DMatch>>* ret )
     // matching
     vector<vector<DMatch>> matches;
     BFMatcher bf( NORM_HAMMING );
-    bf.knnMatch( f1->des, f2->des, *ret, 2 );
+    bf.knnMatch( f1->des, f2->des, matches, 2 );
 
     for( int i = 0; i < matches.size(); i++ )
     {
