@@ -7,6 +7,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/features2d.hpp>
+#include <opencv2/calib3d.hpp>
 
 #include "headers/slam.h"
 
@@ -61,6 +62,8 @@ bool process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
     // if this isn't the first frame, match
     Mat outimg = f->frame;
     vector<vector<DMatch>> matches;
+    vector<Point2f> matches1;
+    vector<Point2f> matches2;
 
     if( all_frames->size() > 1 )
     {
@@ -74,10 +77,17 @@ bool process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
     for( int i = 0; i < matches.size(); i++ )
     {
         // TODO: is matches being indexed properly?
-        Point pt1 = all_frames->end()[-1]->kps[matches[i][0].queryIdx].pt;
-        Point pt2 = all_frames->end()[-2]->kps[matches[i][0].trainIdx].pt;
+        Point2f pt1 = all_frames->end()[-1]->kps[matches[i][0].queryIdx].pt;
+        Point2f pt2 = all_frames->end()[-2]->kps[matches[i][0].trainIdx].pt;
 
         line( outimg, pt1, pt2, Scalar(255,0,0) );
+        matches1.push_back( pt1 );
+        matches2.push_back( pt2 );
+    }
+
+    if( all_frames->size() > 1 )
+    {
+        Mat h = findFundamentalMat( matches1, matches2, 8, 3, 0.99 ); // how to use enum properly instead of 8?
     }
 
     imshow( WIN, outimg );
