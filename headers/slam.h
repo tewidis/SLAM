@@ -3,4 +3,4 @@
 
 #include "extractor.h"
 
-int process_frame( const char* WIN, Frame* f, std::vector<Frame*>* all_frames );
+bool process_frame( const char* WIN, Frame* f, std::vector<Frame*>* all_frames );

@@ -38,10 +38,6 @@ void Frame::extract( Mat window )
     // extract the descriptors
     Ptr<ORB> orb = ORB::create();
     orb->compute( window, this->kps, this->des );
-
-    // clean up before exiting
-    framebw.release();
-    features.clear();
 }
 
 void match_frames( Frame* f1, Frame* f2, vector<vector<DMatch>>* ret )

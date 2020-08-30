@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     const char* WIN = "Original Video";
     namedWindow( WIN, WINDOW_AUTOSIZE );
     moveWindow( WIN, 420, 240 );
-    int isOver;
+    bool isOver;
     vector<Frame*>* all_frames = new vector<Frame*>();
 
     do
@@ -40,14 +40,20 @@ int main(int argc, char** argv)
         resize( frame, frame, Size(480, 270) );
         Frame* f = new Frame( frame );
         isOver = process_frame( WIN, f, all_frames );
+        isOver = true;
     }
     while( !isOver );
 
-    delete( all_frames );
+    // clean up memory
+    for( auto& it : *all_frames )
+    {
+        delete it;
+    }
+    delete all_frames;
     return 0;
 }
 
-int process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
+bool process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
 {
     // detect and extract the features
     f->extract( f->frame );
@@ -68,10 +74,10 @@ int process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
     }
 
     // plot the key points over the frame
-    //drawKeypoints( outimg, f->kps, outimg, Scalar(0,255,0) );
+    drawKeypoints( outimg, f->kps, outimg, Scalar(0,255,0) );
     imshow( WIN, outimg );
 
     char c = (char) waitKey(1);
-    if( c == 27 ) return 1;
-    return 0;
+    if( c == 27 ) return true;
+    return false;
 }
