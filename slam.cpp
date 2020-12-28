@@ -24,9 +24,16 @@ int main(int argc, char** argv)
     }
 
     Mat frame;
+    int W = 1920/2;
+    int H = 1080/2;
+    int F = 200; // focal length
+    Mat K = ( Mat_<double>(3,3) << F, 0, W/2, 0, F, H/2, 0, 0, 1 ); // camera intrinsic matrix
+    Mat Kinv = K.inv();
+
     const char* WIN = "Original Video";
-    namedWindow( WIN, WINDOW_AUTOSIZE );
-    moveWindow( WIN, 420, 240 );
+    namedWindow( WIN, WINDOW_NORMAL );
+    resizeWindow( WIN, W, H );
+    moveWindow( WIN, 0, 0 );
     bool isOver;
     vector<Frame*>* all_frames = new vector<Frame*>();
 
@@ -40,7 +47,7 @@ int main(int argc, char** argv)
         }
         resize( frame, frame, Size(480, 270) );
         Frame* f = new Frame( frame );
-        isOver = process_frame( WIN, f, all_frames );
+        isOver = process_frame( WIN, f, all_frames, K );
     }
     while( !isOver );
 
@@ -53,7 +60,13 @@ int main(int argc, char** argv)
     return 0;
 }
 
-bool process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
+double normalize( Point2f pt, Mat Kinv )
+{
+    Mat expanded = ( Mat_<double>(3,1) << double(pt.x), double(pt.y), 1 );
+    return Kinv.dot( expanded );
+}
+
+bool process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames, Mat K )
 {
     // detect and extract the features
     f->extract( f->frame );
@@ -87,7 +100,12 @@ bool process_frame( const char* WIN, Frame* f, vector<Frame*>* all_frames )
 
     if( all_frames->size() > 1 )
     {
-        Mat h = findFundamentalMat( matches1, matches2, 8, 3, 0.99 ); // how to use enum properly instead of 8?
+        //Mat h = findEssentialMat( matches1, matches2, K, RANSAC, 0.99, 1 );
+
+        //Mat h, S, U, VT;
+        Mat h = findFundamentalMat( matches1, matches2, RANSAC, 3, 0.99 );
+        //SVDecomp( h, S, U, VT, cv::SVD::FULL_UV );
+        cout << h << endl;
     }
 
     imshow( WIN, outimg );
